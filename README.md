@@ -1,6 +1,9 @@
-# MorshuTalk
+# MorshuTalk (macOS fork)
 
 A [Morshu](https://knowyourmeme.com/memes/morshu) text-to-speech program.
+
+This is a fork of [n0spaces/MorshuTalk](https://github.com/n0spaces/MorshuTalk) that adds a native macOS `.app`
+release, built with a lightweight tkinter GUI instead of PySide6. All TTS/audio logic is unchanged from upstream.
 
 ![](screenshot.png)
 
@@ -10,9 +13,26 @@ concatenates the segments of Morshu's audio where he speaks those phonemes.
 ## Requirements
 Python 3.7+ (tested on Windows, should also work on Linux and macOS)
 
-Python is not required if you're just using the MorshuTalk executable.
+Python is not required if you're just using a prebuilt MorshuTalk executable/app.
 
 ## Installation
+### macOS App
+Download `MorshuTalk-macos.zip` from the [latest release](https://github.com/vemboy200/MorshuTalk/releases/latest)
+and unzip it.
+
+This app is signed with an ad-hoc signature only (I'm not an Apple-registered developer, so it isn't notarized).
+macOS Gatekeeper will refuse to open it with a warning like *"MorshuTalk.app is damaged and can't be opened"* or
+*"cannot verify the developer"*. To open it anyway:
+
+1. Right-click (or Control-click) `MorshuTalk.app` and choose **Open**, then confirm **Open** in the dialog that
+   appears — this only needs to be done once.
+2. If that still refuses to open, go to **System Settings → Privacy & Security**, scroll down to the Security
+   section, and click **Open Anyway** next to the MorshuTalk message, then confirm.
+3. If it's still blocked, clear the quarantine flag from Terminal:
+   ```
+   xattr -cr /path/to/MorshuTalk.app
+   ```
+
 ### Windows Executable
 If you're on Windows and you don't want to install Python, you can download an executable from the
 [latest release on GitHub](https://github.com/n0spaces/MorshuTalk/releases/latest). Simply download the 7z or ZIP
@@ -33,6 +53,10 @@ will also need to install PySide6. (It's not included by default because it's a 
     pip install PySide6
 
 ## Running
+### macOS App
+Open `MorshuTalk.app` (see the Gatekeeper note above if it won't open). Type text into the box and click **Speak**
+to hear it, or **Save Audio** to export a `.wav`/`.mp3`.
+
 ### Windows Executable
 Just run `MorshuTalk.exe` to start the GUI.
 
@@ -70,6 +94,17 @@ pyside6-rcc morshutalkgui/res/res.qrc -o morshutalkgui/res_rc.py
     2. Run `python freeze_setup.py build`. The executable and many other files should be located in the `build` folder.
     3. Run `python clean_cx_freeze_build.py` to remove unnecessary files. (cx_freeze does a bad job at choosing what
        packages are necessary. This script removes 150+ MB of unused files.)
+8. Build the macOS `.app` with PyInstaller (this is what [`.github/workflows/build-macos.yml`](.github/workflows/build-macos.yml)
+   runs automatically on every tag push):
+    ```
+    pip install pyinstaller "inflect<6"
+    python3 -m PyInstaller --windowed --onedir --name MorshuTalk --clean \
+        --collect-all morshutalk --collect-all g2p_en macos_gui.py
+    codesign --force --deep -s - dist/MorshuTalk.app
+    xattr -cr dist/MorshuTalk.app
+    ```
+    `inflect<6` avoids a `typeguard`/PyInstaller incompatibility in newer `inflect` releases, and `--collect-all g2p_en`
+    ensures its data files are bundled into the app.
 
 ## License
 [MIT License](LICENSE.txt)
