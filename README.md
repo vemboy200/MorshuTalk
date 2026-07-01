@@ -5,13 +5,15 @@ A [Morshu](https://knowyourmeme.com/memes/morshu) text-to-speech program.
 This is a fork of [n0spaces/MorshuTalk](https://github.com/n0spaces/MorshuTalk) that adds a native macOS `.app`
 release, built with a lightweight tkinter GUI instead of PySide6. All TTS/audio logic is unchanged from upstream.
 
-![](screenshot.png)
+<img width="554" height="241" alt="image" src="https://github.com/user-attachments/assets/6ee7751d-ae1e-4c2d-a6a7-b60f1120bce2" />
+
+Its quite basic, but you can make it speak or save the shown text as .wav or .mp3 file
 
 This program works by converting the given text into phonemes with [g2p_en](https://pypi.org/project/g2p-en/), then
 concatenates the segments of Morshu's audio where he speaks those phonemes.
 
 ## Requirements
-Python 3.7+ (tested on Windows, should also work on Linux and macOS)
+Python 3.7+ (tested on macos 27 developer beta 2)
 
 Python is not required if you're just using a prebuilt MorshuTalk executable/app.
 
@@ -35,7 +37,7 @@ macOS Gatekeeper will refuse to open it with a warning like *"MorshuTalk.app is 
 
 ### Windows Executable
 If you're on Windows and you don't want to install Python, you can download an executable from the
-[latest release on GitHub](https://github.com/n0spaces/MorshuTalk/releases/latest). Simply download the 7z or ZIP
+[the upstream of this fork](https://github.com/n0spaces/MorshuTalk/releases/latest). Simply download the 7z or ZIP
 archive (they're both identical) and extract it.
 
 ### Python Package
@@ -57,8 +59,6 @@ will also need to install PySide6. (It's not included by default because it's a 
 Open `MorshuTalk.app` (see the Gatekeeper note above if it won't open). Type text into the box and click **Speak**
 to hear it, or **Save Audio** to export a `.wav`/`.mp3`.
 
-### Windows Executable
-Just run `MorshuTalk.exe` to start the GUI.
 
 ### Python Package
 Installing the package will add the commands `morshutalk` and `morshutalkgui` to your command-line. If those commands
