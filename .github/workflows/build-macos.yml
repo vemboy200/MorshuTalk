@@ -1,0 +1,50 @@
+name: Build macOS app
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch: {}
+
+jobs:
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip3 install pyinstaller "inflect<6" numpy pydub sounddevice g2p_en
+          pip3 install .
+
+      - name: Build .app with PyInstaller
+        run: |
+          python3 -m PyInstaller --windowed --onedir --name MorshuTalk --clean \
+            --collect-all morshutalk --collect-all g2p_en macos_gui.py
+
+      - name: Ad-hoc codesign
+        run: |
+          codesign --force --deep -s - dist/MorshuTalk.app
+          xattr -cr dist/MorshuTalk.app
+
+      - name: Zip app bundle
+        run: |
+          cd dist
+          ditto -c -k --sequesterRsrc --keepParent MorshuTalk.app MorshuTalk-macos.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: MorshuTalk-macos
+          path: dist/MorshuTalk-macos.zip
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: dist/MorshuTalk-macos.zip
